@@ -6,11 +6,11 @@ export default function unplugins() {
   return [
     AutoImport({
       dts: "src/types/auto-imports.d.ts",
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver()]
     }),
     Components({
       dts: "src/types/components.d.ts",
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver()]
     })
-  ]
-};
+  ];
+}

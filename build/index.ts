@@ -1,4 +1,9 @@
+import { dirname } from "node:path/win32";
 import { resolve } from "path";
+import { fileURLToPath } from "url";
+
+/** 当前执行node命令时文件夹的地址（工作目录） */
+const rootPath: string = process.cwd();
 
 const wrapperEnv = (envConf: Recordable): ViteEnv => {
   const ret: ViteEnv = {
@@ -11,28 +16,38 @@ const wrapperEnv = (envConf: Recordable): ViteEnv => {
   };
 
   for (const envName of Object.keys(envConf)) {
-    let realName = envConf[envName].replace(/\\n/g, "\n");
-    realName = realName === "true" ? true : realName === "false" ? false : realName;
+    let configVal = envConf[envName].replace(/\\n/g, "\n");
+    configVal = configVal === "true" ? true : configVal === "false" ? false : configVal;
 
     if (envName === "VITE_PORT") {
-      realName = Number(realName);
+      configVal = Number(configVal);
     }
-    ret[envName] = realName;
-    if (typeof realName === "string") {
-      process.env[envName] = realName;
-    } else if (typeof realName === "object") {
-      process.env[envName] = JSON.stringify(realName);
+    ret[envName] = configVal;
+    if (typeof configVal === "string") {
+      process.env[envName] = configVal;
+    } else if (typeof configVal === "object") {
+      process.env[envName] = JSON.stringify(configVal);
     }
   }
   return ret;
 };
 
-/** 当前执行node命令时文件夹的地址（工作目录） */
-const rootPath = (): string => process.cwd();
-
 /** 路径查找 */
-const pathResolve = (dir: string): string => {
-  return resolve(__dirname, ".", dir);
+const pathResolve = (dir = ".", metaUrl = import.meta.url) => {
+  console.log("metaUrl: ", metaUrl);
+  const curDir = dirname(fileURLToPath(metaUrl));
+  const buildDir = resolve(curDir, "build");
+  const resolvedPath = resolve(curDir, dir);
+  if (resolvedPath.startsWith(buildDir)) {
+    return fileURLToPath(metaUrl);
+  }
+  return resolvedPath;
 };
 
-export { rootPath, pathResolve, wrapperEnv }
+/** 设置别名 */
+const alias: Record<string, string> = {
+  "@": pathResolve("../src"),
+  "@build": pathResolve()
+};
+
+export { rootPath, alias, pathResolve, wrapperEnv };

@@ -4,16 +4,15 @@ import vueJsx from "@vitejs/plugin-vue-jsx";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import svgLoader from "vite-svg-loader";
 import unplugins from "./unplugin";
-import { resolve } from "path";
+import { pathResolve } from "./index";
 
 function setupI18n(): PluginOption {
   return VueI18nPlugin({
-    runtimeOnly: true,
-    compositionOnly: true,
-    include: [resolve("locales/**")]
+    jitCompilation: false,
+    include: [pathResolve("../locales/**")]
   });
 }
 
-export function setupPluginList(): PluginOption[] {
+export function setupPlugin(): PluginOption[] {
   return [vue(), vueJsx(), setupI18n(), svgLoader(), ...unplugins()];
 }
