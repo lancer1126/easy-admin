@@ -34,7 +34,6 @@ const wrapperEnv = (envConf: Recordable): ViteEnv => {
 
 /** 路径查找 */
 const pathResolve = (dir = ".", metaUrl = import.meta.url) => {
-  console.log("metaUrl: ", metaUrl);
   const curDir = dirname(fileURLToPath(metaUrl));
   const buildDir = resolve(curDir, "build");
   const resolvedPath = resolve(curDir, dir);

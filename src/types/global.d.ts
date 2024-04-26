@@ -15,4 +15,9 @@ declare global {
     VITE_HIDE_HOME: string;
     VITE_COMPRESSION: ViteCompression;
   }
+
+  interface PlatformConfig {
+    version?: string;
+    title?: string;
+  }
 }
