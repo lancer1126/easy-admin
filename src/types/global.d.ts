@@ -1,3 +1,5 @@
+import type { ECharts } from "echarts";
+
 declare global {
   /**
    * 打包压缩格式的类型声明
@@ -19,5 +21,9 @@ declare global {
   interface PlatformConfig {
     version?: string;
     title?: string;
+  }
+
+  interface GlobalPropertiesApi {
+    $echarts: ECharts;
   }
 }
