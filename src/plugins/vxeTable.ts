@@ -1,7 +1,6 @@
 import "vxe-table/lib/style.css";
 import type { App } from "vue";
 
-
 import {
   // 全局对象
   VXETable,
@@ -14,8 +13,7 @@ import {
 } from "vxe-table";
 
 // 全局默认参数
-VXETable.config({
-});
+VXETable.config({});
 
 export function useVxeTable(app: App) {
   // 表格功能

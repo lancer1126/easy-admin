@@ -26,6 +26,9 @@ importers:
       echarts:
         specifier: ^5.5.0
         version: 5.5.0
+      element-plus:
+        specifier: ^2.7.1
+        version: 2.7.2(vue@3.4.25(typescript@5.4.5))
       pinia:
         specifier: ^2.1.7
         version: 2.1.7(typescript@5.4.5)(vue@3.4.25(typescript@5.4.5))

@@ -2,6 +2,7 @@ import App from "./App.vue";
 import router from "@/router";
 import { createApp } from "vue";
 import { MotionPlugin } from "@vueuse/motion";
+import { FontIcon, IconifyIconOffline, IconifyIconOnline } from "@/components/ReIcon";
 import { getPlatformConfig } from "@/config";
 import { setupStore } from "@/store";
 import { useI18n } from "@/plugins/i18n";
@@ -11,7 +12,6 @@ import { useVxeTable } from "./plugins/vxeTable";
 import PureTable from "@pureadmin/table";
 import PureDescriptions from "@pureadmin/descriptions";
 
-import "./style/style.css";
 // 引入重置样式
 import "./style/reset.scss";
 // 导入公共样式
@@ -23,6 +23,11 @@ import "./assets/iconfont/iconfont.js";
 import "./assets/iconfont/iconfont.css";
 
 const app = createApp(App);
+
+// 全局注册@iconify/vue图标库
+app.component("IconifyIconOffline", IconifyIconOffline);
+app.component("IconifyIconOnline", IconifyIconOnline);
+app.component("FontIcon", FontIcon);
 
 getPlatformConfig(app).then(async () => {
   setupStore(app);
