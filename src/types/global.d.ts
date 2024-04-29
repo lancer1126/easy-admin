@@ -1,5 +1,5 @@
 import type { ECharts } from "echarts";
-import type { RouteComponent } from "vue-router";
+import type { RouteComponent, RouteLocationNormalized } from "vue-router";
 import type { FunctionalComponent } from "vue";
 
 declare global {
@@ -27,6 +27,10 @@ declare global {
 
   interface GlobalPropertiesApi {
     $echarts: ECharts;
+  }
+
+  interface ToRouteType extends RouteLocationNormalized {
+    meta: CustomizeRouteMeta;
   }
 
   /**

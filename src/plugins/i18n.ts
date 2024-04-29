@@ -23,6 +23,8 @@ export const localeConfig = {
   }
 };
 
+export const $t = (key: string) => key;
+
 export const i18n: I18n = createI18n({
   legacy: false,
   locale: "zh",

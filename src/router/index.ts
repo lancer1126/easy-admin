@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-rou
 import { ascending, formatFlatteningRoutes, formatTwoStageRoutes } from "@/router/utils";
 import { buildHierarchyTree } from "@/utils/tree";
 import remainingRouter from "./modules/remaining";
+import NProgress from "nprogress";
 
 /**
  * 自动导入全部静态路由，匹配 src/router/modules 目录（任何嵌套级别）中具有 .ts 扩展名的所有文件，
@@ -28,6 +29,14 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes: constantRoutes.concat(...(remainingRouter as any)),
   strict: true
+});
+
+router.beforeEach(() => {
+  NProgress.start();
+});
+
+router.afterEach(() => {
+  NProgress.done();
 });
 
 export default router;
