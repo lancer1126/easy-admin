@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-router";
+import {createRouter, createWebHashHistory, Router, type RouteRecordRaw} from "vue-router";
 import { ascending, formatFlatteningRoutes, formatTwoStageRoutes } from "@/router/utils";
 import { buildHierarchyTree } from "@/utils/tree";
 import remainingRouter from "./modules/remaining";
@@ -25,7 +25,7 @@ export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(
 );
 
 /** 创建路由实例 */
-const router = createRouter({
+const router: Router = createRouter({
   history: createWebHashHistory(),
   routes: constantRoutes.concat(...(remainingRouter as any)),
   strict: true

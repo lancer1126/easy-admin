@@ -1,5 +1,8 @@
-import { isAllEmpty } from "@pureadmin/utils";
+import { isAllEmpty, isIncludeAllChildren, isString } from "@pureadmin/utils";
 import type { RouteRecordRaw } from "vue-router";
+import router from "@/router/index";
+import { getConfig } from "@/config";
+import { storageLocal } from "@/store/utils";
 
 /**
  * @description 创建层级关系
@@ -83,4 +86,25 @@ function formatTwoStageRoutes(routesList: RouteRecordRaw[]) {
   return newRoutesList;
 }
 
-export { ascending, formatFlatteningRoutes, formatTwoStageRoutes };
+function initRouter() {
+  // todo initRouter
+  return new Promise(resolve => {
+    resolve(router);
+  });
+}
+
+/** 获取当前页面按钮级别的权限 */
+function getAuths(): Array<string> {
+  return router.currentRoute.value.meta.auths as Array<string>;
+}
+
+/** 是否有按钮级别的权限 */
+function hasAuth(value: string | Array<string>): boolean {
+  if (!value) return false;
+  /** 从当前路由的`meta`字段里获取按钮级别的所有自定义`code`值 */
+  const metaAuths = getAuths();
+  if (!metaAuths) return false;
+  return isString(value) ? metaAuths.includes(value) : isIncludeAllChildren(value, metaAuths);
+}
+
+export { hasAuth, initRouter, ascending, formatFlatteningRoutes, formatTwoStageRoutes };

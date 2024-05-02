@@ -23,6 +23,7 @@ declare global {
   interface PlatformConfig {
     version?: string;
     title?: string;
+    CachingAsyncRoutes?: boolean;
   }
 
   interface GlobalPropertiesApi {

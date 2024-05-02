@@ -190,7 +190,7 @@ login:
   pureRemember: 天内免登录
   pureRememberInfo: 勾选并登录后，规定天数内无需输入用户名和密码会自动登入系统
   pureSure: 确认密码
-  pureForget: 忘记密码?
+  pureForget: 忘记密码
   pureLogin: 登录
   pureThirdLogin: 第三方登录
   purePhoneLogin: 手机登录
