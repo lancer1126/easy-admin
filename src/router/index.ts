@@ -1,8 +1,14 @@
-import {createRouter, createWebHashHistory, Router, type RouteRecordRaw} from "vue-router";
+import { createRouter, createWebHashHistory, type Router, type RouteRecordRaw } from "vue-router";
 import { ascending, formatFlatteningRoutes, formatTwoStageRoutes } from "@/router/utils";
 import { buildHierarchyTree } from "@/utils/tree";
 import remainingRouter from "./modules/remaining";
 import NProgress from "nprogress";
+import { isUrl, storageLocal } from "@/store/utils";
+import { type DataInfo, MULTI_TABS_KEY, removeToken, USER_KEY } from "@/utils/auth";
+import { getConfig } from "@/config";
+import { transformI18n } from "@/plugins/i18n";
+import Cookies from "js-cookie";
+import { openLink } from "@pureadmin/utils";
 
 /**
  * 自动导入全部静态路由，匹配 src/router/modules 目录（任何嵌套级别）中具有 .ts 扩展名的所有文件，
@@ -14,6 +20,8 @@ const modules: Record<string, any> = import.meta.glob(["./modules/**/*.ts", "!./
 
 /** 原始静态路由 */
 const routes = [];
+/** 路由白名单 */
+const whiteList = ["/login"];
 
 Object.keys(modules).forEach(key => {
   routes.push(modules[key].default);
@@ -31,8 +39,54 @@ const router: Router = createRouter({
   strict: true
 });
 
-router.beforeEach(() => {
+router.beforeEach((to, _from, next) => {
   NProgress.start();
+  const userInfo = storageLocal().getItem<DataInfo<number>>(USER_KEY);
+  const externalLink: boolean = isUrl(to?.name as string);
+  if (!externalLink) {
+    to.matched.some(item => {
+      if (!item.meta.title) {
+        return "";
+      }
+      // 设置页面标题
+      const title: string = getConfig().title;
+      if (title) {
+        document.title = `${transformI18n(item.meta.title)} | ${title}`;
+      } else {
+        document.title = transformI18n(item.meta.title);
+      }
+    });
+  }
+
+  function correctRoute() {
+    whiteList.includes(to.fullPath) ? next(_from.fullPath) : next();
+  }
+
+  // 存在MULTI_TABS_KEY且存在userInfo视为已登录
+  if (Cookies.get(MULTI_TABS_KEY) && userInfo) {
+    if (_from?.name) {
+      // 目标路由name为超链接
+      if (externalLink) {
+        openLink(to?.name as string);
+        NProgress.done();
+      } else {
+        correctRoute();
+      }
+    } else {
+      correctRoute();
+    }
+  } else {
+    if (to.path !== "/login") {
+      if (whiteList.includes(to.path)) {
+        next();
+      } else {
+        removeToken();
+        next({ path: "/login" });
+      }
+    } else {
+      next();
+    }
+  }
 });
 
 router.afterEach(() => {

@@ -1,6 +1,7 @@
 import type { ECharts } from "echarts";
 import type { RouteComponent, RouteLocationNormalized } from "vue-router";
 import type { FunctionalComponent } from "vue";
+import type { IconifyIcon } from "@iconify/vue";
 
 declare global {
   /**
@@ -125,5 +126,11 @@ declare global {
     };
     /** 子路由配置项 */
     children?: Array<RouteChildrenConfigsTable>;
+  }
+
+  interface CommonResult {
+    success: boolean;
+    code: number;
+    data: any;
   }
 }

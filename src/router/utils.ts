@@ -1,8 +1,6 @@
 import { isAllEmpty, isIncludeAllChildren, isString } from "@pureadmin/utils";
 import type { RouteRecordRaw } from "vue-router";
 import router from "@/router/index";
-import { getConfig } from "@/config";
-import { storageLocal } from "@/store/utils";
 
 /**
  * @description 创建层级关系

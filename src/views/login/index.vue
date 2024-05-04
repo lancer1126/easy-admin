@@ -16,6 +16,7 @@ import { initRouter } from "@/router/utils";
 import { useRouter } from "vue-router";
 import { useEventListener } from "@vueuse/core";
 import { debounce } from "@pureadmin/utils";
+import { setToken } from "@/utils/auth";
 
 defineComponent({
   name: "Login"
@@ -43,9 +44,10 @@ const onLogin = async (formEl: FormInstance | undefined) => {
     if (valid) {
       loading.value = true;
       useUserStoreHook()
-        .login()
-        .then(res => {
-          if (res.success) {
+        .login(ruleForm)
+        .then(resp => {
+          if (resp.success) {
+            setToken(resp.data);
             return initRouter().then(() => {
               disabled.value = true;
               router.push("/welcome").finally(() => (disabled.value = false));
