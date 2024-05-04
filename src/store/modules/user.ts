@@ -17,6 +17,18 @@ export const useUserStore = defineStore({
     loginDay: 7
   }),
   actions: {
+    /** 存储验证码 */
+    SET_VERIFY_CODE(verifyCode: string) {
+      this.verifyCode = verifyCode;
+    },
+    /** 存储是否勾选了登录页的免登录 */
+    SET_REMEMBERED(remember: boolean) {
+      this.isRemembered = remember;
+    },
+    /** 设置登录页的免登录存储几天 */
+    SET_LOGIN_DAY(value: number) {
+      this.loginDay = Number(value);
+    },
     async login() {
       // todo 登录
       return { success: true };

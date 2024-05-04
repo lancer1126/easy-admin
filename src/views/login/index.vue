@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { bg, illustration, avatar } from "./utils/static";
-import { toRaw, ref, reactive, defineComponent } from "vue";
+import { toRaw, ref, reactive, defineComponent, watch } from "vue";
 import Motion from "@/views/login/utils/motion";
 import { FormInstance } from "element-plus";
 import { loginRules } from "@/views/login/utils/rule";
@@ -14,6 +14,8 @@ import IconifyIconOffline from "@/components/ReIcon/src/iconifyIconOffline";
 import { useUserStoreHook } from "@/store/modules/user";
 import { initRouter } from "@/router/utils";
 import { useRouter } from "vue-router";
+import { useEventListener } from "@vueuse/core";
+import { debounce } from "@pureadmin/utils";
 
 defineComponent({
   name: "Login"
@@ -54,6 +56,23 @@ const onLogin = async (formEl: FormInstance | undefined) => {
     }
   });
 };
+const immediateDebounce: any = debounce(formRef => onLogin(formRef), 1000, true);
+
+watch(imgCode, value => {
+  useUserStoreHook().SET_VERIFY_CODE(value);
+});
+watch(checked, value => {
+  useUserStoreHook().SET_REMEMBERED(value);
+});
+watch(loginDay, value => {
+  useUserStoreHook().SET_LOGIN_DAY(value);
+});
+
+useEventListener(document, "keypress", ({ code }) => {
+  if (code === "Enter" && !disabled.value && !loading.value) {
+    immediateDebounce(ruleFormRef.value);
+  }
+});
 </script>
 
 <template>
