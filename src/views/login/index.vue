@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { bg, illustration, avatar } from "./utils/static";
-import { toRaw, ref, reactive, defineComponent, watch } from "vue";
+import { toRaw, ref, reactive, watch } from "vue";
 import Motion from "@/views/login/utils/motion";
 import { FormInstance } from "element-plus";
 import { loginRules } from "@/views/login/utils/rule";
@@ -18,7 +18,7 @@ import { useEventListener } from "@vueuse/core";
 import { debounce } from "@pureadmin/utils";
 import { setToken } from "@/utils/auth";
 
-defineComponent({
+defineOptions({
   name: "Login"
 });
 

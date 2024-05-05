@@ -6,7 +6,8 @@ const { VITE_HIDE_HOME } = import.meta.env;
 export default {
   path: "/",
   name: "Home",
-  redirect: "/login",
+  component: import("@/layout/index.vue"),
+  redirect: "/welcome",
   meta: {
     icon: "ep:home-filled",
     title: $t("menus.pureHome"),

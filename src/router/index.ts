@@ -49,7 +49,7 @@ router.beforeEach((to, _from, next) => {
         return "";
       }
       // 设置页面标题
-      const title: string = getConfig().title;
+      const title: string = getConfig().Title;
       if (title) {
         document.title = `${transformI18n(item.meta.title)} | ${title}`;
       } else {

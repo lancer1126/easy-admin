@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { defineComponent, watch } from "vue";
+import { watch } from "vue";
 import { useImageVerify } from "@/components/ReImageVerify/src/hooks";
 
-defineComponent({
+defineOptions({
   name: "ReImageVerify"
 });
 

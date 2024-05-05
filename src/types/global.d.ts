@@ -22,13 +22,16 @@ declare global {
   }
 
   interface PlatformConfig {
-    version?: string;
-    title?: string;
+    Version?: string;
+    Title?: string;
+    FixedHeader?: boolean;
+    HiddenSideBar?: boolean;
     CachingAsyncRoutes?: boolean;
   }
 
   interface GlobalPropertiesApi {
     $echarts: ECharts;
+    $config: PlatformConfig;
   }
 
   interface ToRouteType extends RouteLocationNormalized {
