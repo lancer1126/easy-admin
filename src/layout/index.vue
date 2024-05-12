@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { SetType } from "@/layout/types";
-import { computed, reactive } from "vue";
+import { computed, onMounted, reactive } from "vue";
 import { useAppStoreHook } from "@/store/modules/app";
 import { useSettingStoreHook } from "@/store/modules/setting";
 import AppMain from "@/layout/components/appMain.vue";
+import Vertical from "@/layout/components/sidebar/vertical.vue";
 
 const globalSetting = useSettingStoreHook();
 
@@ -27,10 +28,15 @@ const set: SetType = reactive({
   }),
   hideTabs: false
 });
+
+onMounted(() => {
+  window.document.body.setAttribute("layout", "vertical");
+});
 </script>
 
 <template>
   <div ref="appWrapper" :class="['app-wrapper', set.classes]">
+    <Vertical />
     <div :class="['main-container']">
       <AppMain />
     </div>

@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory, type Router, type RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, type RouteComponent, type Router, type RouteRecordRaw } from "vue-router";
 import { ascending, formatFlatteningRoutes, formatTwoStageRoutes } from "@/router/utils";
 import { buildHierarchyTree } from "@/utils/tree";
 import remainingRouter from "./modules/remaining";
@@ -31,6 +31,9 @@ Object.keys(modules).forEach(key => {
 export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(
   formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity))))
 );
+
+/** 用于渲染菜单，保持原始层级 */
+export const constantMenus: Array<RouteComponent> = ascending(routes.flat(Infinity)).concat(...remainingRouter);
 
 /** 创建路由实例 */
 const router: Router = createRouter({
