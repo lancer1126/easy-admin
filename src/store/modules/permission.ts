@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { store } from "@/store";
 import { constantMenus } from "@/router";
+import { formatFlatteningRoutes } from "@/router/utils";
 
 export const usePermissionStore = defineStore({
   id: "pure-permission",
@@ -13,7 +14,15 @@ export const usePermissionStore = defineStore({
     flatteningRoutes: [],
     // 缓存页面keepAlive
     cachePageList: []
-  })
+  }),
+  actions: {
+    /** 组装整体路由生成的菜单 */
+    handleWholeMenus(routes: any[]) {
+      const total = this.constantMenus.concat(routes);
+      this.wholeMenus = total;
+      this.flatteningRoutes = formatFlatteningRoutes(total);
+    }
+  }
 });
 
 export function usePermissionStoreHook() {

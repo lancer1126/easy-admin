@@ -1,30 +1,12 @@
-import { isAllEmpty, isIncludeAllChildren, isString } from "@pureadmin/utils";
+import { cloneDeep, isAllEmpty, isIncludeAllChildren, isString } from "@pureadmin/utils";
 import type { RouteRecordRaw } from "vue-router";
 import router from "@/router/index";
+import struct from "@/router/struct";
+import { buildHierarchyTree } from "@/utils/tree";
+import { usePermissionStoreHook } from "@/store/modules/permission";
 
-/**
- * @description 创建层级关系
- * @param tree 树
- * @param pathList 每一项的id组成的数组
- * @returns 创建层级关系后的树
- */
-export const buildHierarchyTree = (tree: any[], pathList = []): any => {
-  if (!Array.isArray(tree)) {
-    console.warn("tree must be an array");
-    return [];
-  }
-  if (!tree || tree.length === 0) return [];
-  for (const [key, node] of tree.entries()) {
-    node.id = key;
-    node.parentId = pathList.length ? pathList[pathList.length - 1] : null;
-    node.pathList = [...pathList, node.id];
-    const hasChildren = node.children && node.children.length > 0;
-    if (hasChildren) {
-      buildHierarchyTree(node.children, node.pathList);
-    }
-  }
-  return tree;
-};
+const IFrame = () => import("@/layout/frameView.vue");
+const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
 
 function handRank(routeInfo: any) {
   const { name, path, parentId, meta } = routeInfo;
@@ -84,9 +66,62 @@ function formatTwoStageRoutes(routesList: RouteRecordRaw[]) {
   return newRoutesList;
 }
 
+/** 过滤后端传来的动态路由 重新生成规范路由 */
+function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
+  if (!arrRoutes || !arrRoutes.length) return;
+  const modulesRoutesKeys = Object.keys(modulesRoutes);
+  arrRoutes.forEach((v: RouteRecordRaw) => {
+    // 将backstage属性加入meta，标识此路由为后端返回路由
+    v.meta.backstage = true;
+    // 父级的redirect属性取值：如果子级存在且父级的redirect属性不存在，默认取第一个子级的path；如果子级存在且父级的redirect属性存在，取存在的redirect属性，会覆盖默认值
+    if (v?.children && v.children.length && !v.redirect) {
+      v.redirect = v.children[0].path;
+    }
+    // 父级的name属性取值：如果子级存在且父级的name属性不存在，默认取第一个子级的name；如果子级存在且父级的name属性存在，取存在的name属性，会覆盖默认值（注意：测试中发现父级的name不能和子级name重复，如果重复会造成重定向无效（跳转404），所以这里给父级的name起名的时候后面会自动加上`Parent`，避免重复）
+    if (v?.children && v.children.length && !v.name) {
+      v.name = (v.children[0].name as string) + "Parent";
+    }
+    if (v.meta?.frameSrc) {
+      v.component = IFrame;
+    } else {
+      // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会跟path保持一致）
+      const index = v?.component
+        ? modulesRoutesKeys.findIndex(ev => ev.includes(v.component as any))
+        : modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
+      v.component = modulesRoutes[modulesRoutesKeys[index]];
+    }
+    if (v?.children && v.children.length) {
+      addAsyncRoutes(v.children);
+    }
+  });
+  return arrRoutes;
+}
+
+/** 封装路由 */
+function handleRoutes(routeList: any) {
+  formatFlatteningRoutes(addAsyncRoutes(routeList)).map((v: RouteRecordRaw) => {
+    // 防止重复添加路由
+    if (router.options.routes[0].children.findIndex(value => value.path === v.path) !== -1) {
+      return;
+    } else {
+      // 将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
+      router.options.routes[0].children.push(v);
+      // 最终路由进行升序
+      ascending(router.options.routes[0].children);
+      if (!router.hasRoute(v?.name)) {
+        router.addRoute(v);
+      }
+      const flattenRouters: any = router.getRoutes().find(n => n.path === "/");
+      router.addRoute(flattenRouters);
+    }
+  });
+  usePermissionStoreHook().handleWholeMenus(routeList);
+}
+
+/** 初始化路由 */
 function initRouter() {
-  // todo initRouter
   return new Promise(resolve => {
+    handleRoutes(cloneDeep(struct.data));
     resolve(router);
   });
 }

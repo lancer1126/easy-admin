@@ -8,10 +8,12 @@ const showLogo = ref(true);
 const menus = computed(() => {
   return usePermissionStoreHook().wholeMenus;
 });
+const loading = computed(() => menus.value.length === 0);
 </script>
 
 <template>
   <div
+    v-loading="loading"
     :class="['sidebar-container', 'has-logo']"
     @mouseenter.prevent="showScroll = true"
     @mouseleave.prevent="showScroll = false"
