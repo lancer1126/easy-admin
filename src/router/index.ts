@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteComponent, type Router, type RouteRecordRaw } from "vue-router";
-import { ascending, formatFlatteningRoutes, formatTwoStageRoutes } from "@/router/utils";
+import { ascending, formatFlatteningRoutes, formatTwoStageRoutes, initRouter } from "@/router/utils";
 import { buildHierarchyTree } from "@/utils/tree";
 import remainingRouter from "./modules/remaining";
 import NProgress from "nprogress";
@@ -8,7 +8,7 @@ import { type DataInfo, MULTI_TABS_KEY, removeToken, USER_KEY } from "@/utils/au
 import { getConfig } from "@/config";
 import { transformI18n } from "@/plugins/i18n";
 import Cookies from "js-cookie";
-import { openLink } from "@pureadmin/utils";
+import { isAllEmpty, openLink } from "@pureadmin/utils";
 
 /**
  * 自动导入全部静态路由，匹配 src/router/modules 目录（任何嵌套级别）中具有 .ts 扩展名的所有文件，
@@ -76,6 +76,11 @@ router.beforeEach((to, _from, next) => {
         correctRoute();
       }
     } else {
+      initRouter().then((r: Router) => {
+        if (isAllEmpty(to.name)) {
+          r.push(to.fullPath);
+        }
+      });
       correctRoute();
     }
   } else {

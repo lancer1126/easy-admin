@@ -27,7 +27,7 @@ export const TOKEN_KEY = "authorized-token";
  * 浏览器完全关闭后`multiple-tabs`将自动从`cookie`中销毁，
  * 再次打开浏览器需要重新登录系统
  * */
-export const MULTI_TABS_KEY: string = "multiple-tabs";
+export const MULTI_TABS_KEY: string = "multiple-easy-tabs";
 
 /** 存储鉴权信息 */
 export function setToken(data: DataInfo<Date>) {
