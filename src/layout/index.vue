@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { SetType } from "@/layout/types";
-import { computed, onMounted, reactive } from "vue";
+import { h, computed, defineComponent, onMounted, reactive } from "vue";
 import { useAppStoreHook } from "@/store/modules/app";
 import { useSettingStoreHook } from "@/store/modules/setting";
 import AppMain from "@/layout/components/appMain.vue";
 import Vertical from "@/layout/components/sidebar/vertical.vue";
+import Navbar from "@/layout/components/navbar.vue";
+import Tag from "@/layout/components/tag/index.vue";
 
 const globalSetting = useSettingStoreHook();
 
@@ -32,12 +34,25 @@ const set: SetType = reactive({
 onMounted(() => {
   window.document.body.setAttribute("layout", "vertical");
 });
+
+let layoutHeader = defineComponent({
+  render() {
+    return h(
+      "div",
+      { class: { "fixed-header": set.fixedHeader } },
+      {
+        default: () => [h(Navbar), h(Tag)]
+      }
+    );
+  }
+});
 </script>
 
 <template>
   <div ref="appWrapper" :class="['app-wrapper', set.classes]">
     <Vertical />
     <div :class="['main-container']">
+      <layout-header />
       <AppMain />
     </div>
   </div>

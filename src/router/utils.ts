@@ -2,6 +2,7 @@ import { cloneDeep, isAllEmpty, isIncludeAllChildren, isString } from "@pureadmi
 import type { RouteRecordRaw } from "vue-router";
 import router from "@/router/index";
 import struct from "@/router/struct";
+import { isProxy, toRaw } from "vue";
 import { buildHierarchyTree } from "@/utils/tree";
 import { usePermissionStoreHook } from "@/store/modules/permission";
 
@@ -64,6 +65,24 @@ function formatTwoStageRoutes(routesList: RouteRecordRaw[]) {
     }
   });
   return newRoutesList;
+}
+
+/** 查找对应 `path` 的路由信息 */
+function findRouteByPath(path: string, routes: RouteRecordRaw[]) {
+  let res = routes.find((item: { path: string }) => item.path == path);
+  if (res) {
+    return isProxy(res) ? toRaw(res) : res;
+  } else {
+    for (let i = 0; i < routes.length; i++) {
+      if (routes[i].children instanceof Array && routes[i].children.length > 0) {
+        res = findRouteByPath(path, routes[i].children);
+        if (res) {
+          return isProxy(res) ? toRaw(res) : res;
+        }
+      }
+    }
+    return null;
+  }
 }
 
 /** 过滤后端传来的动态路由 重新生成规范路由 */
@@ -140,4 +159,4 @@ function hasAuth(value: string | Array<string>): boolean {
   return isString(value) ? metaAuths.includes(value) : isIncludeAllChildren(value, metaAuths);
 }
 
-export { hasAuth, initRouter, ascending, formatFlatteningRoutes, formatTwoStageRoutes };
+export { hasAuth, initRouter, ascending, formatFlatteningRoutes, formatTwoStageRoutes, findRouteByPath };
