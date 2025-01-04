@@ -1,5 +1,7 @@
 {
   "version": "1.0.0",
   "title": "easy-admin",
-  "fixedHeader": true
+  "fixedHeader": true,
+  "ResponsiveStorageNameSpace": "responsive-",
+  "Locale": "zh"
 }

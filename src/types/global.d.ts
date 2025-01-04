@@ -27,6 +27,8 @@ declare global {
     FixedHeader?: boolean;
     HiddenSideBar?: boolean;
     CachingAsyncRoutes?: boolean;
+    ResponsiveStorageNameSpace?: string;
+    Locale?: string;
   }
 
   interface GlobalPropertiesApi {

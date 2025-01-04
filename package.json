@@ -53,6 +53,7 @@
     "postcss-import": "^16.1.0",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.2.5",
+    "responsive-storage": "^2.2.0",
     "sass": "^1.75.0",
     "stylelint": "^16.4.0",
     "stylelint-config-recess-order": "^5.0.1",

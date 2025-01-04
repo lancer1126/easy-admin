@@ -4,7 +4,7 @@ import { h, computed, defineComponent, onMounted, reactive } from "vue";
 import { useAppStoreHook } from "@/store/modules/app";
 import { useSettingStoreHook } from "@/store/modules/setting";
 import AppMain from "@/layout/components/appMain.vue";
-import Vertical from "@/layout/components/sidebar/vertical.vue";
+import NavVertical from "@/layout/components/sidebar/NavVertical.vue";
 import Navbar from "@/layout/components/navbar.vue";
 import Tag from "@/layout/components/tag/index.vue";
 
@@ -50,7 +50,7 @@ let layoutHeader = defineComponent({
 
 <template>
   <div ref="appWrapper" :class="['app-wrapper', set.classes]">
-    <Vertical />
+    <NavVertical />
     <div :class="['main-container']">
       <layout-header />
       <AppMain />

@@ -11,6 +11,7 @@ import { setupStore } from "@/store";
 import { useI18n } from "@/plugins/i18n";
 import { useEcharts } from "@/plugins/echarts";
 import { useVxeTable } from "./plugins/vxeTable";
+import { initResponsiveStorage } from "@/utils/responsive";
 
 // 引入重置样式
 import "./style/reset.scss";
@@ -39,10 +40,11 @@ app.component("IconifyIconOffline", IconifyIconOffline);
 app.component("IconifyIconOnline", IconifyIconOnline);
 app.component("FontIcon", FontIcon);
 
-getPlatformConfig(app).then(async () => {
+getPlatformConfig(app).then(async config => {
   setupStore(app);
   app.use(router);
   await router.isReady();
+  initResponsiveStorage(app, config);
 
   app
     .use(MotionPlugin)
