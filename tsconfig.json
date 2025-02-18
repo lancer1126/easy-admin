@@ -36,6 +36,6 @@
       "@pureadmin/descriptions/volar"
     ]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/types/*.d.ts", "vite.config.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/**/*.d.ts", "vite.config.ts"],
   "exclude": ["dist", "**/*.js", "node_modules"]
 }
