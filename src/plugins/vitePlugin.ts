@@ -3,7 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import UnoCss from "unocss/vite";
 import AutoImport from "unplugin-auto-import/vite";
 import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
-import IconResolver from "unplugin-icons/resolver";
+import IconsResolver from "unplugin-icons/resolver";
 import Components from "unplugin-vue-components/vite";
 import compression from "vite-plugin-compression";
 import Icons from "unplugin-icons/vite";
@@ -62,17 +62,18 @@ const setupUnPlugins = () => {
     AutoImport({
       // 自动导入vue、pinia等API，无需在文件中手动导入
       imports: ["vue", "vue-router", "@vueuse/core", "pinia"],
-      resolvers: [ElementPlusResolver(), IconResolver({ prefix: "Icon" })],
+      resolvers: [ElementPlusResolver(), IconsResolver({ prefix: "Icon" })],
       dts: path.resolve(process.cwd(), "src/types/auto-imports.d.ts"),
+      vueTemplate: true,
       // 生成和管理ESLint的配置文件，以确保自动导入的函数和组件不会被ESLint报错
       eslintrc: {
-        enabled: false,
+        enabled: false, // 首次启动设为true，成功生成文件后改为false
         filepath: path.resolve(process.cwd(), ".eslintrc-auto-import.json"),
         globalsPropValue: true
       }
     }),
     Components({
-      resolvers: [ElementPlusResolver(), IconResolver({ prefix: "ep" })],
+      resolvers: [ElementPlusResolver(), IconsResolver({ enabledCollections: ["ep"] })],
       dts: path.resolve(process.cwd(), "src/types/components.d.ts")
     })
   ];

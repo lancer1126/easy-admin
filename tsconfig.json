@@ -31,9 +31,7 @@
     },
     "types": [
       "node",
-      "vite/client",
-      "@pureadmin/table/volar",
-      "@pureadmin/descriptions/volar"
+      "vite/client"
     ]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/**/*.d.ts", "vite.config.ts"],

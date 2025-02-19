@@ -5,7 +5,7 @@ import zh from "./locales/zh_CN.json";
 import en from "./locales/en_US.json";
 
 // 获取系统当前使用的语言
-const getCurLanguage = (): LanguageEnum => {
+export const getCurLanguage = (): LanguageEnum => {
   const lang = useStorage<LanguageEnum>("language", LanguageEnum.zh_CN);
   if (lang.value) {
     return lang.value;

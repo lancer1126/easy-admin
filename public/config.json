@@ -1,0 +1,12 @@
+{
+  "title": "easy-admin",
+  "layoutSetting": {
+    "topNav": false,
+    "tagsView": true,
+    "fixedHeader": false,
+    "sidebarLogo": false,
+    "dynamicTitle": false,
+    "sideTheme": "theme-dark",
+    "theme": "default"
+  }
+}
