@@ -31,6 +31,13 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       }
     },
     plugins: setupPlugins(viteEnv, mode === "build"),
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: "modern"
+        }
+      }
+    },
     optimizeDeps: {
       include: [
         "vue",

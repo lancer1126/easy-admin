@@ -13,9 +13,12 @@
     "@element-plus/icons-vue": "^2.3.1",
     "@vueuse/core": "^10.9.0",
     "@vueuse/motion": "^2.1.0",
+    "await-to-js": "3.0.0",
     "axios": "^1.7.9",
+    "crypto-js": "^4.2.0",
     "echarts": "^5.5.0",
     "element-plus": "^2.7.2",
+    "jsencrypt": "^3.3.2",
     "js-cookie": "^3.0.5",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
@@ -26,6 +29,7 @@
     "vxe-table": "^4.6.8"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.0",
     "@eslint/js": "^9.1.1",
     "@iconify/json": "^2.2.276",
     "@types/js-cookie": "^3.0.6",

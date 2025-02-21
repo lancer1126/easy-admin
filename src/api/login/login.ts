@@ -1,6 +1,9 @@
 import { AxiosPromise } from "axios";
-import { TenantInfo } from "@/api/types";
+import { LoginData, LoginResult, TenantInfo, VerifyCode } from "@/api/types";
 import request from "@/utils/request";
+
+// pc端固定客户端授权id
+const defaultClient = import.meta.env.VITE_APP_CLIENT_ID;
 
 /**
  * 获取租户列表
@@ -12,6 +15,41 @@ export function getTenantList(hasToken: boolean): AxiosPromise<TenantInfo> {
     method: "get",
     headers: {
       hasToken: hasToken
+    }
+  });
+}
+
+/**
+ * 获取验证码
+ */
+export function getCodeImg(): AxiosPromise<VerifyCode> {
+  return request({
+    url: "/auth/code",
+    method: "get",
+    timeout: 20000,
+    headers: {
+      hasToken: false
+    }
+  });
+}
+
+/**
+ * 登录api
+ */
+export function login(loginData: LoginData): AxiosPromise<LoginResult> {
+  const params = {
+    ...loginData,
+    clientId: loginData.clientId || defaultClient,
+    grantType: loginData.grantType || "password"
+  };
+  return request({
+    url: "/auth/login",
+    method: "post",
+    data: params,
+    headers: {
+      hasToken: false,
+      isEncrypt: true,
+      repeatSubmit: false
     }
   });
 }

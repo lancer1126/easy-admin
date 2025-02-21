@@ -1,6 +1,7 @@
 {
   "globals": {
     "ElFormRules": true,
+    "ElFormInstance": true,
     "Component": true,
     "ComponentPublicInstance": true,
     "ComputedRef": true,

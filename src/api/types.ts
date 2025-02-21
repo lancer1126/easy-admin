@@ -16,6 +16,13 @@ export interface LoginData {
 }
 
 /**
+ * 登录响应
+ */
+export interface LoginResult {
+  access_token: string;
+}
+
+/**
  * 租户
  */
 export interface TenantVO {
@@ -27,4 +34,13 @@ export interface TenantVO {
 export interface TenantInfo {
   tenantEnabled: boolean;
   voList: TenantVO[];
+}
+
+/**
+ * 验证码返回
+ */
+export interface VerifyCode {
+  captchaEnabled: boolean;
+  uuid?: string;
+  img?: string;
 }

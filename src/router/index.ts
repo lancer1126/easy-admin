@@ -31,6 +31,7 @@ const beforeEachGuard = async (to: any, from: any, next: any) => {
 
     if (useUserStore().roles.length === 0) {
       // todo 有token但是无角色权限
+      next();
     } else {
       // 数据无误，正常跳转
       next();

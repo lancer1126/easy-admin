@@ -1,8 +1,13 @@
-import axios, { InternalAxiosRequestConfig } from "axios";
+import axios from "axios";
 import { getCurLanguage } from "@/lang";
 import { getToken, transParams } from "@/utils/auth";
 import { HttpStatus } from "@/enums/RespEnum";
 import errorCode from "@/utils/errCode";
+import cache from "@/plugins/cache";
+import { encryptBase64, encryptWithAes, generateAesKey } from "@/utils/crypto";
+import { encrypt } from "@/utils/jsencrypt";
+
+const encryptHeader = "encrypt-key";
 
 const service = axios.create({
   baseURL: import.meta.env.VITE_BASE_API,
@@ -10,10 +15,12 @@ const service = axios.create({
 });
 
 // 请求拦截器
-const requestInterceptor = (config: any): InternalAxiosRequestConfig => {
+const requestInterceptor = (config: any): Promise<any> => {
   config.headers["Content-Language"] = getCurLanguage();
   // 设置token
   const hasToken = config.headers?.hasToken === false;
+  const isRepeatSubmit = config.headers?.repeatSubmit === false;
+  const isEncrypt = config.headers?.isEncrypt === "true";
   if (!hasToken && getToken()) {
     config.headers["Authorization"] = "Bearer " + getToken();
   }
@@ -24,6 +31,46 @@ const requestInterceptor = (config: any): InternalAxiosRequestConfig => {
       config.url = `${config.url}?${paramStr}`;
     }
     config.params = {};
+  }
+  // 防止重复请求
+  if (!isRepeatSubmit && (config.method === "post" || config.method === "put")) {
+    const requestObj = {
+      url: config.url,
+      data: typeof config.data === "object" ? JSON.stringify(config.data) : config.data,
+      time: new Date().getTime()
+    };
+    const sessionObj = cache.session.getJSON("sessionObj");
+    if (sessionObj === undefined || sessionObj === null || sessionObj === "") {
+      cache.session.setJSON("sessionObj", requestObj);
+    } else {
+      const s_url = sessionObj.url; // 请求地址
+      const s_data = sessionObj.data; // 请求数据
+      const s_time = sessionObj.time; // 请求时间
+      const interval = 500; // 间隔时间(ms)，小于此时间视为重复提交
+      if (s_data === requestObj.data && requestObj.time - s_time < interval && s_url === requestObj.url) {
+        const message = "数据正在处理，请勿重复提交";
+        console.warn(`[${s_url}]: ` + message);
+        return Promise.reject(new Error(message));
+      } else {
+        cache.session.setJSON("sessionObj", requestObj);
+      }
+    }
+  }
+  // 当开启参数加密
+  if (import.meta.env.VITE_APP_ENCRYPT === "true") {
+    if (isEncrypt && (config.method === "post" || config.method === "put")) {
+      // 生成一个 AES 密钥
+      const aesKey = generateAesKey();
+      config.headers[encryptHeader] = encrypt(encryptBase64(aesKey));
+      config.data =
+        typeof config.data === "object"
+          ? encryptWithAes(JSON.stringify(config.data), aesKey)
+          : encryptWithAes(config.data, aesKey);
+    }
+  }
+  // FormData数据去请求头Content-Type
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
   }
   return config;
 };
