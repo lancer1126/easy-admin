@@ -10,6 +10,8 @@ export const setToken = (token: string) => {
   tokenStorage.value = token;
 };
 
+export const removeToken = () => (tokenStorage.value = null);
+
 export const transParams = (params: any) => {
   let result = "";
   for (const propName of Object.keys(params)) {

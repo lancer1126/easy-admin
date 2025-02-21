@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { constantRoutes, whiteList } from "@/router/modules/constant";
-import { isPathMatch } from "@/utils/validate";
+import { isHttp, isPathMatch } from "@/utils/validate";
 import NProgress from "nprogress";
 import { getToken } from "@/utils/auth";
 import useUserStore from "@/store/modules/user";
+import { to as tos } from "await-to-js";
+import usePermissionStore from "@/store/modules/permission";
 
 // 跳转路径是否在白名单中
 const isWhiteList = (path: string) => {
@@ -30,8 +32,29 @@ const beforeEachGuard = async (to: any, from: any, next: any) => {
     }
 
     if (useUserStore().roles.length === 0) {
-      // todo 有token但是无角色权限
-      next();
+      // 判断当前用户是否已拉取完user_info信息
+      const [err] = await tos(useUserStore().getInfo());
+      if (err) {
+        await useUserStore().logout();
+        ElMessage.error(err);
+        next({ path: "/" });
+      } else {
+        // 根据roles权限生成可访问的路由表
+        const accessRoutes = await usePermissionStore().generateRoutes();
+        accessRoutes.forEach(route => {
+          if (!isHttp(route.path)) {
+            router.addRoute(route); // 动态添加可访问路由表
+          }
+        });
+        next({
+          path: to.path,
+          replace: true,
+          params: to.params,
+          query: to.query,
+          hash: to.hash,
+          name: to.name as string
+        });
+      }
     } else {
       // 数据无误，正常跳转
       next();

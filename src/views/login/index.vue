@@ -195,6 +195,10 @@ onMounted(() => {
         </el-button>
       </el-form-item>
     </el-form>
+    <!--  底部  -->
+    <div class="el-login-footer">
+      <span>Copyright © 2024-2025 lancer1126 Rights Reserved.</span>
+    </div>
   </div>
 </template>
 
@@ -202,7 +206,7 @@ onMounted(() => {
 .login {
   display: flex;
   justify-content: center;
-  align-content: center;
+  align-items: center;
   height: 100%;
   background-size: cover;
   background-image: url("@/assets/images/background-gta6.jpg");
@@ -214,6 +218,20 @@ onMounted(() => {
   width: 400px;
   padding: 25px 25px 5px 25px;
   opacity: 0.8;
+
+  .el-input {
+    height: 40px;
+
+    input {
+      height: 40px;
+    }
+  }
+
+  .input-icon {
+    height: 39px;
+    width: 14px;
+    margin-left: 0;
+  }
 }
 
 .title-box {
@@ -246,5 +264,18 @@ onMounted(() => {
 .code-image {
   height: 38px;
   padding-right: 0;
+}
+
+.el-login-footer {
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  color: #fff;
+  font-family: Arial, serif;
+  font-size: 12px;
+  letter-spacing: 1px;
 }
 </style>

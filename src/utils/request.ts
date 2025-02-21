@@ -9,6 +9,9 @@ import { encrypt } from "@/utils/jsencrypt";
 
 const encryptHeader = "encrypt-key";
 
+axios.defaults.headers["Content-Type"] = "application/json;charset=utf-8";
+axios.defaults.headers["clientId"] = import.meta.env.VITE_APP_CLIENT_ID;
+
 const service = axios.create({
   baseURL: import.meta.env.VITE_BASE_API,
   timeout: 30000
@@ -32,7 +35,7 @@ const requestInterceptor = (config: any): Promise<any> => {
     }
     config.params = {};
   }
-  // 防止重复请求
+  // 防止重复提交
   if (!isRepeatSubmit && (config.method === "post" || config.method === "put")) {
     const requestObj = {
       url: config.url,

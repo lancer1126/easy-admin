@@ -1,5 +1,5 @@
 import { AxiosPromise } from "axios";
-import { LoginData, LoginResult, TenantInfo, VerifyCode } from "@/api/types";
+import { LoginData, LoginResult, TenantInfo, UserInfo, VerifyCode } from "@/api/types";
 import request from "@/utils/request";
 
 // pc端固定客户端授权id
@@ -51,5 +51,29 @@ export function login(loginData: LoginData): AxiosPromise<LoginResult> {
       isEncrypt: true,
       repeatSubmit: false
     }
+  });
+}
+
+/**
+ * 注销
+ */
+export function logout() {
+  if (import.meta.env.VITE_APP_SSE === "true") {
+    request({
+      url: "/resource/sse/close",
+      method: "get"
+    });
+  }
+  return request({
+    url: "/auth/logout",
+    method: "post"
+  });
+}
+
+// 获取用户详细信息
+export function getUserInfo(): AxiosPromise<UserInfo> {
+  return request({
+    url: "/system/user/getInfo",
+    method: "get"
   });
 }

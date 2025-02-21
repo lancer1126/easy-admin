@@ -8,3 +8,12 @@ export function isPathMatch(pattern: string, path: string) {
   const regex = new RegExp(`^${regexPattern}$`);
   return regex.test(path);
 }
+
+/**
+ * 判断url是否是http或https
+ * @returns {Boolean}
+ * @param url
+ */
+export const isHttp = (url: string): boolean => {
+  return url.indexOf("http://") !== -1 || url.indexOf("https://") !== -1;
+};
