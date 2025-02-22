@@ -2,7 +2,16 @@ import { defineStore } from "pinia";
 
 const useSettingStore = defineStore("setting", () => {
   let configTitle: string = "easy-admin";
-  const defaultLayout = ref<LayoutSetting>(null);
+  const defaultLayout = ref<LayoutSetting>({
+    topNav: false,
+    tagsView: true,
+    fixedHeader: false,
+    sidebarLogo: false,
+    dynamicTitle: false,
+    sideTheme: "theme-dark",
+    theme: "default"
+  });
+
   onMounted(async () => {
     const resp = await fetch("/config.json");
     if (!resp.ok) {

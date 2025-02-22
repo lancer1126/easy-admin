@@ -133,7 +133,7 @@ onMounted(() => {
     <!-- 登录表单 -->
     <el-form ref="loginRef" class="login-form" :model="loginForm" :rules="loginRules">
       <div class="title-box">
-        <h3 class="title">GTA6入口(假的)</h3>
+        <h3 class="title">GTA6入口(不是)</h3>
       </div>
       <!-- 租户信息 -->
       <el-form-item v-if="tenantEnabled" prop="tenantId">
@@ -217,7 +217,7 @@ onMounted(() => {
   background: #ffffff;
   width: 400px;
   padding: 25px 25px 5px 25px;
-  opacity: 0.8;
+  opacity: 0.85;
 
   .el-input {
     height: 40px;
