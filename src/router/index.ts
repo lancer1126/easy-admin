@@ -31,30 +31,30 @@ const beforeEachGuard = async (to: any, from: any, next: any) => {
       return;
     }
 
+    // 如果本地存储中没有用户的角色信息，则重新获取一遍
     if (useUserStore().roles.length === 0) {
-      // 判断当前用户是否已拉取完user_info信息
-      const [err] = await tos(useUserStore().getInfo());
+      const [err] = await tos(useUserStore().getAndSaveInfo());
       if (err) {
         await useUserStore().logout();
         ElMessage.error(err);
         next({ path: "/" });
-      } else {
-        // 根据roles权限生成可访问的路由表
-        const accessRoutes = await usePermissionStore().generateRoutes();
-        accessRoutes.forEach(route => {
-          if (!isHttp(route.path)) {
-            router.addRoute(route); // 动态添加可访问路由表
-          }
-        });
-        next({
-          path: to.path,
-          replace: true,
-          params: to.params,
-          query: to.query,
-          hash: to.hash,
-          name: to.name as string
-        });
+        return;
       }
+      // 根据roles权限生成可访问的路由表
+      const accessRoutes = await usePermissionStore().generateRoutes();
+      accessRoutes.forEach(route => {
+        if (!isHttp(route.path)) {
+          router.addRoute(route); // 动态添加可访问路由表
+        }
+      });
+      next({
+        path: to.path,
+        replace: true,
+        params: to.params,
+        query: to.query,
+        hash: to.hash,
+        name: to.name as string
+      });
     } else {
       // 数据无误，正常跳转
       next();

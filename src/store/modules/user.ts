@@ -3,6 +3,7 @@ import { getToken, removeToken, setToken } from "@/utils/auth";
 import { LoginData } from "@/api/types";
 import { getUserInfo, login as loginApi, logout as logoutApi } from "@/api/login/login";
 import { to } from "await-to-js";
+import usePermissionStore from "./permission";
 import defAva from "@/assets/images/profile.jpg";
 
 const useUserStore = defineStore("user", () => {
@@ -24,6 +25,8 @@ const useUserStore = defineStore("user", () => {
     token.value = data.access_token;
     // token进行保存
     setToken(data.access_token);
+    // 保存用户路由信息
+    await usePermissionStore().generateRoutes();
     return Promise.resolve();
   };
 
@@ -36,8 +39,8 @@ const useUserStore = defineStore("user", () => {
     removeToken();
   };
 
-  // 获取用户信息
-  const getInfo = async (): Promise<void> => {
+  // 获取用户信息并保存
+  const getAndSaveInfo = async (): Promise<void> => {
     const [err, res] = await to(getUserInfo());
     if (res) {
       const data = res.data;
@@ -70,7 +73,7 @@ const useUserStore = defineStore("user", () => {
     permissions,
     login,
     logout,
-    getInfo
+    getAndSaveInfo
   };
 });
 

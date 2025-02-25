@@ -1,15 +1,122 @@
+import { getUserRoutes } from "@/api/system/menu/menu";
+import { createCustomNameComponent } from "@/utils/custom";
 import { defineStore } from "pinia";
 import { RouteRecordRaw } from "vue-router";
 
+// 读取项目中所有的views文件夹下的.vue文件
+const projectViewModules = import.meta.glob("@/views/**/*.vue");
+const moduleMap: Map<string, () => Promise<any>> = new Map();
+/**
+ * 转为map便于匹配
+ */
+const buildModuleMap = () => {
+  Object.entries(projectViewModules).forEach(([path, module]) => {
+    const componentName = path.replace(/^.*\/views\//, "").replace(/\.vue$/, "");
+    moduleMap.set(componentName, module);
+  });
+};
+
 const usePermissionStore = defineStore("permission", () => {
-  const generateRoutes = (): Promise<RouteRecordRaw[]> => {
-    // todo 根据用户权限生成属于用户的动态路由
-    return Promise.resolve([]);
+  const sidebarRoutes = ref<RouteRecordRaw[]>([]);
+  const rewriteRoutes = ref<RouteRecordRaw[]>([]);
+
+  const setSidebarRoutes = (routes: RouteRecordRaw[]): void => {
+    sidebarRoutes.value = routes;
+  };
+
+  const setRewriteRoutes = (routes: RouteRecordRaw[]): void => {
+    rewriteRoutes.value = routes;
+  };
+
+  /**
+   * 递归扁平化children的路由，使其成为一维数组
+   * @param routes 路由列表
+   * @param lastRoute 上一级路由
+   */
+  const flattenChildren = (routes: RouteRecordRaw[], lastRoute: RouteRecordRaw): RouteRecordRaw[] => {
+    let children: RouteRecordRaw[] = [];
+    routes.forEach(el => {
+      if (el.children && el.children.length) {
+        if (el.component?.toString() === "ParentView" && !lastRoute) {
+          el.children.forEach(c => {
+            c.path = el.path + "/" + c.path;
+            if (c.children && c.children.length) {
+              children = children.concat(flattenChildren(c.children, c));
+              return;
+            }
+            children.push(c);
+          });
+          return;
+        }
+      }
+      if (lastRoute) {
+        el.path = lastRoute.path + "/" + el.path;
+        if (el.children && el.children.length) {
+          children = children.concat(flattenChildren(el.children, el));
+          return;
+        }
+      }
+      children = children.concat(el);
+    });
+    return children;
+  };
+
+  /**
+   * 构建路由相关属性
+   */
+  const buildRoutes = (routes: RouteRecordRaw[], isRewrite: boolean = false): RouteRecordRaw[] => {
+    return routes.filter(r => {
+      if (isRewrite && r.children) {
+        r.children = flattenChildren(r.children, undefined);
+      }
+      // 使用名称匹配组件并设置在路由中
+      r.component = loadView(r.component, r.name as string);
+      if (r.children?.length) {
+        r.children = buildRoutes(r.children);
+      }
+    });
+  };
+
+  /**
+   * 解析并生成用户路由
+   */
+  const generateRoutes = async (): Promise<RouteRecordRaw[]> => {
+    const res = await getUserRoutes();
+    const { data } = res;
+    const routeData = JSON.parse(JSON.stringify(data));
+
+    if (moduleMap.size === 0) {
+      buildModuleMap();
+    }
+    const filteredRoutes = buildRoutes(routeData);
+    const _rewriteRoutes = buildRoutes(routeData, true);
+
+    setSidebarRoutes(filteredRoutes);
+    setRewriteRoutes(_rewriteRoutes);
+
+    return new Promise(resolve => {
+      resolve(_rewriteRoutes);
+    });
   };
 
   return {
+    sidebarRoutes,
+    flattenChildren,
+    buildRoutes,
     generateRoutes
   };
 });
+
+/**
+ * 把路由组件名称转换为组件
+ */
+function loadView(view: any, name: string): Promise<any> {
+  moduleMap
+    .get(view)?.()
+    .then((component: any) => {
+      return createCustomNameComponent(component, { name });
+    });
+  return null;
+}
 
 export default usePermissionStore;
