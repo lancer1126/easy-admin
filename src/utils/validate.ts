@@ -17,3 +17,12 @@ export function isPathMatch(pattern: string, path: string) {
 export const isHttp = (url: string): boolean => {
   return url.indexOf("http://") !== -1 || url.indexOf("https://") !== -1;
 };
+
+/**
+ * 判断path是否为外链
+ * @param {string} path
+ * @returns {Boolean}
+ */
+export const isExternal = (path: string) => {
+  return /^(https?:|mailto:|tel:)/.test(path);
+};

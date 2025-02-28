@@ -1,5 +1,5 @@
 {
-  "title": "easy-admin",
+  "appName": "easy-admin",
   "layoutSetting": {
     "topNav": false,
     "tagsView": true,

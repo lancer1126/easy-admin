@@ -62,18 +62,28 @@ const usePermissionStore = defineStore("permission", () => {
   };
 
   /**
+   * 将多级嵌套路由转换为一维数组
+   */
+  const rewriteChildren = (routes: RouteRecordRaw[]): RouteRecordRaw[] => {
+    return routes.filter(r => {
+      if (r.children && r.children.length) {
+        r.children = flattenChildren(r.children, null);
+      }
+      return true;
+    });
+  };
+
+  /**
    * 构建路由相关属性
    */
-  const buildRoutes = (routes: RouteRecordRaw[], isRewrite: boolean = false): RouteRecordRaw[] => {
+  const matchRouteComponent = (routes: RouteRecordRaw[]): RouteRecordRaw[] => {
     return routes.filter(r => {
-      if (isRewrite && r.children) {
-        r.children = flattenChildren(r.children, undefined);
-      }
       // 使用名称匹配组件并设置在路由中
       r.component = loadView(r.component, r.name as string);
       if (r.children?.length) {
-        r.children = buildRoutes(r.children);
+        r.children = matchRouteComponent(r.children);
       }
+      return true;
     });
   };
 
@@ -88,8 +98,8 @@ const usePermissionStore = defineStore("permission", () => {
     if (moduleMap.size === 0) {
       buildModuleMap();
     }
-    const filteredRoutes = buildRoutes(routeData);
-    const _rewriteRoutes = buildRoutes(routeData, true);
+    const filteredRoutes = matchRouteComponent(routeData);
+    const _rewriteRoutes = rewriteChildren(filteredRoutes);
 
     setSidebarRoutes(filteredRoutes);
     setRewriteRoutes(_rewriteRoutes);
@@ -102,7 +112,7 @@ const usePermissionStore = defineStore("permission", () => {
   return {
     sidebarRoutes,
     flattenChildren,
-    buildRoutes,
+    matchRouteComponent,
     generateRoutes
   };
 });
@@ -110,13 +120,20 @@ const usePermissionStore = defineStore("permission", () => {
 /**
  * 把路由组件名称转换为组件
  */
-function loadView(view: any, name: string): Promise<any> {
-  moduleMap
-    .get(view)?.()
-    .then((component: any) => {
+function loadView(viewPath: any, name: string): Promise<any> {
+  const moduleLoader = moduleMap.get(viewPath);
+  if (!moduleLoader) {
+    return Promise.resolve(null);
+  }
+
+  return moduleLoader()
+    .then(component => {
       return createCustomNameComponent(component, { name });
+    })
+    .catch((error: any) => {
+      console.log(`组件${viewPath}不存在: ${error.message}`);
+      return null;
     });
-  return null;
 }
 
 export default usePermissionStore;

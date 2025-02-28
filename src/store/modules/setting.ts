@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 const useSettingStore = defineStore("setting", () => {
-  let configTitle: string = "easy-admin";
+  let configAppName: string = "easy-admin";
   const defaultLayout = ref<LayoutSetting>({
     topNav: false,
     tagsView: true,
@@ -18,14 +18,14 @@ const useSettingStore = defineStore("setting", () => {
       throw new Error("Failed to fetch config.json");
     }
     const config = await resp.json();
-    configTitle = config.title;
+    configAppName = config.appName;
     if (config.layoutSetting) {
       Object.assign(defaultLayout, config.layoutSetting);
     }
   });
 
   const storageSetting = useStorage<LayoutSetting>("layout-setting", defaultLayout);
-  const title = ref<string>(configTitle);
+  const appName = ref<string>(configAppName);
   const theme = ref<string>(storageSetting.value.theme);
   const sideTheme = ref<string>(storageSetting.value.sideTheme);
   const topNav = ref<boolean>(storageSetting.value.topNav);
@@ -35,7 +35,7 @@ const useSettingStore = defineStore("setting", () => {
   const dynamicTitle = ref<boolean>(storageSetting.value.dynamicTitle);
 
   return {
-    title,
+    appName,
     theme,
     sideTheme,
     topNav,
