@@ -3,7 +3,7 @@ import logoImg from "@/assets/images/GTA VI Logo.svg.png";
 import useSettingStore from "@/store/modules/setting";
 
 const appName = useSettingStore().appName;
-const props = defineProps({
+defineProps({
   collapsed: {
     type: Boolean,
     required: true
@@ -12,7 +12,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="sidebar-logo-container">
+  <div class="sidebar-logo-container" :class="{ collapsed: collapsed }">
     <router-link to="/" class="sidebar-logo-link">
       <img :src="logoImg" class="sidebar-logo" alt="" />
       <h1 class="sidebar-app-name">{{ appName }}</h1>
@@ -34,10 +34,10 @@ const props = defineProps({
     height: 100%;
 
     & .sidebar-logo {
-      width: 35px;
-      height: 35px;
+      width: 34px;
+      height: 34px;
       vertical-align: middle;
-      margin-right: 20px;
+      margin-right: 16px;
     }
 
     & .sidebar-app-name {
@@ -54,6 +54,12 @@ const props = defineProps({
         Arial,
         Helvetica,
         sans-serif;
+    }
+  }
+
+  &.collapsed {
+    .sidebar-logo {
+      margin-right: 5px;
     }
   }
 }
