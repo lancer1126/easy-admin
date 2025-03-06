@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>应用主要显示区域</div>
+  <router-view />
 </template>
 
 <style scoped></style>

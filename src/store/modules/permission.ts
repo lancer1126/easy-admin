@@ -2,7 +2,12 @@ import { getUserRoutes } from "@/api/system/menu/menu";
 import { createCustomNameComponent } from "@/utils/custom";
 import { defineStore } from "pinia";
 import { RouteRecordRaw } from "vue-router";
+import { constantRoutes } from "@/router/modules/constant";
+import Layout from "@/layout/index.vue";
+import Page404 from "@/views/error/404.vue";
 
+// 全局父组件Layout
+const LAYOUT: string = "Layout";
 // 读取项目中所有的views文件夹下的.vue文件
 const projectViewModules = import.meta.glob("@/views/**/*.vue");
 const moduleMap: Map<string, () => Promise<any>> = new Map();
@@ -79,7 +84,11 @@ const usePermissionStore = defineStore("permission", () => {
   const matchRouteComponent = (routes: RouteRecordRaw[]): RouteRecordRaw[] => {
     return routes.filter(r => {
       // 使用名称匹配组件并设置在路由中
-      r.component = loadView(r.component, r.name as string);
+      if (r.component?.toString() === LAYOUT) {
+        r.component = Layout;
+      } else {
+        r.component = loadView(r.component, r.name as string);
+      }
       if (r.children?.length) {
         r.children = matchRouteComponent(r.children);
       }
@@ -101,7 +110,7 @@ const usePermissionStore = defineStore("permission", () => {
     const filteredRoutes = matchRouteComponent(routeData);
     const _rewriteRoutes = rewriteChildren(filteredRoutes);
 
-    setSidebarRoutes(filteredRoutes);
+    setSidebarRoutes(constantRoutes.concat(filteredRoutes));
     setRewriteRoutes(_rewriteRoutes);
 
     return new Promise(resolve => {
@@ -120,20 +129,15 @@ const usePermissionStore = defineStore("permission", () => {
 /**
  * 把路由组件名称转换为组件
  */
-function loadView(viewPath: any, name: string): Promise<any> {
+function loadView(viewPath: any, name: string) {
   const moduleLoader = moduleMap.get(viewPath);
   if (!moduleLoader) {
-    return Promise.resolve(null);
+    console.warn(`找不到组件路径: ${viewPath}`);
+    // 返回404组件而非null，防止路由错误
+    return Page404;
   }
-
-  return moduleLoader()
-    .then(component => {
-      return createCustomNameComponent(component, { name });
-    })
-    .catch((error: any) => {
-      console.log(`组件${viewPath}不存在: ${error.message}`);
-      return null;
-    });
+  // 返回包装后的组件
+  return createCustomNameComponent(moduleLoader, { name });
 }
 
 export default usePermissionStore;
