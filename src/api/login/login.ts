@@ -70,10 +70,26 @@ export function logout() {
   });
 }
 
-// 获取用户详细信息
+/**
+ * 获取用户详细信息
+ */
 export function getUserInfo(): AxiosPromise<UserInfo> {
   return request({
     url: "/system/user/getInfo",
     method: "get"
+  });
+}
+
+/**
+ * 第三方跳转登录，获取跳转链接
+ */
+export function socialLogin(source: string, tenantId: string): any {
+  return request({
+    url: "/auth/binding/" + source,
+    method: "get",
+    params: {
+      tenantId: tenantId,
+      domain: window.location.host
+    }
   });
 }

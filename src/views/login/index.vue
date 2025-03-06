@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { LoginData, TenantVO } from "@/api/types";
 import { useI18n } from "vue-i18n";
-import { getCodeImg, getTenantList } from "@/api/login/login";
+import { getCodeImg, getTenantList, socialLogin } from "@/api/login/login";
 import { to } from "await-to-js";
 import useUserStore from "@/store/modules/user";
+import { HttpStatus } from "@/enums/RespEnum";
 
 const { t } = useI18n();
 const loading = ref(false);
@@ -113,6 +114,20 @@ const initLoginData = () => {
   } as LoginData;
 };
 
+/**
+ * 第三方登录获取跳转链接
+ */
+const doSocialLogin = (source: string) => {
+  console.log("tenantId: " + loginForm.value.tenantId);
+  socialLogin(source, loginForm.value.tenantId).then((res: any) => {
+    if (res.code === HttpStatus.SUCCESS) {
+      window.location.href = res.data;
+    } else {
+      ElMessage.error(res.msg);
+    }
+  });
+};
+
 watch(
   () => router.currentRoute.value,
   (newRoute: any) => {
@@ -187,6 +202,15 @@ onMounted(() => {
       <el-checkbox v-model="loginForm.rememberMe" style="margin: 0 0 15px 0">
         {{ $t("login.rememberPassword") }}
       </el-checkbox>
+      <!-- 第三方登录 -->
+      <el-form-item class="social-login">
+        <el-button circle :title="t('login.social.gitee')" @click="doSocialLogin('gitee')">
+          <svg-icon icon-class="gitee" />
+        </el-button>
+        <el-button circle :title="t('login.social.github')" @click="doSocialLogin('github')">
+          <svg-icon icon-class="github" />
+        </el-button>
+      </el-form-item>
       <!-- 登录按钮 -->
       <el-form-item style="width: 100%">
         <el-button :loading="loading" size="large" type="primary" style="width: 100%" @click.prevent="handleLogin">
@@ -277,5 +301,9 @@ onMounted(() => {
   font-family: Arial, serif;
   font-size: 12px;
   letter-spacing: 1px;
+}
+
+.social-login {
+  float: right;
 }
 </style>

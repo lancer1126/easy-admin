@@ -1,6 +1,6 @@
 import { RouteRecordRaw } from "vue-router";
 
-export const whiteList = ["/login", "/register", "/register*", "/register/*"];
+export const whiteList = ["/login", "/register", "/register*", "/register/*", "/social-callback"];
 
 export const constantRoutes: RouteRecordRaw[] = [
   {
