@@ -15,6 +15,7 @@ const toggleSidebar = () => appStore.toggleSidebar();
 <template>
   <div class="navbar-container">
     <hamburger class="hamburger-container" :is-opened="sidebarOpened" @toggle-click="toggleSidebar" />
+    <breadcrumb />
   </div>
 </template>
 
