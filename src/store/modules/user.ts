@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { getToken, removeToken, setToken } from "@/utils/auth";
-import { LoginData } from "@/api/types";
+import { LoginData } from "@/api/login/types";
 import { getUserInfo, login as loginApi, logout as logoutApi } from "@/api/login/login";
 import { to } from "await-to-js";
 import usePermissionStore from "./permission";

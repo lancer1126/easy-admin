@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import zhCN from "element-plus/es/locale/lang/zh-cn";
+import enUS from "element-plus/es/locale/lang/en";
 
 const useAppStore = defineStore("app", () => {
   const sidebarStatus = useStorage("sidebarStatus", "1");
@@ -8,6 +10,11 @@ const useAppStore = defineStore("app", () => {
     hide: false,
     withoutAnimation: false
   });
+
+  // 控制element-plus显示语言
+  const elLangObj: any = { en_US: enUS, zh_CN: zhCN };
+  const language = useStorage("language", "zh_CN");
+  const locale = computed(() => elLangObj[language.value]);
 
   /**
    * 控制侧边栏是否收缩
@@ -20,6 +27,7 @@ const useAppStore = defineStore("app", () => {
   return {
     device,
     sidebar,
+    locale,
     toggleSidebar
   };
 });

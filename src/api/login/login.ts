@@ -1,5 +1,5 @@
 import { AxiosPromise } from "axios";
-import { LoginData, LoginResult, TenantInfo, UserInfo, VerifyCode } from "@/api/types";
+import { LoginData, LoginResult, TenantInfo, UserInfo, VerifyCode } from "@/api/login/types";
 import request from "@/utils/request";
 
 // pc端固定客户端授权id

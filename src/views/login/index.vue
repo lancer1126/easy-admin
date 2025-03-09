@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LoginData, TenantVO } from "@/api/types";
+import { LoginData, TenantVO } from "@/api/login/types";
 import { useI18n } from "vue-i18n";
 import { getCodeImg, getTenantList, socialLogin } from "@/api/login/login";
 import { to } from "await-to-js";

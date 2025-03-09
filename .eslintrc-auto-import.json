@@ -1,5 +1,7 @@
 {
   "globals": {
+    "PageData": true,
+    "DateModelType": true,
     "ElFormRules": true,
     "ElFormInstance": true,
     "Component": true,
