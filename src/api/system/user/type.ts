@@ -1,3 +1,5 @@
+import { RoleVO } from "../role/types";
+
 /**
  * 用户查询对象类型
  */
@@ -26,4 +28,31 @@ export interface UserForm {
   remark?: string;
   postIds: string[];
   roleIds: string[];
+}
+
+/**
+ * 用户返回对象
+ */
+export interface UserVO extends BaseEntity {
+  userId: string | number;
+  tenantId: string;
+  deptId: number;
+  userName: string;
+  nickName: string;
+  userType: string;
+  email: string;
+  phonenumber: string;
+  sex: string;
+  avatar: string;
+  status: string;
+  delFlag: string;
+  loginIp: string;
+  loginDate: string;
+  remark: string;
+  deptName: string;
+  roles: RoleVO[];
+  roleIds: any;
+  postIds: any;
+  roleId: any;
+  admin: boolean;
 }

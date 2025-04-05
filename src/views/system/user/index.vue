@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { UserVO } from "@/api/system/user/type";
 import { DeptTreeVO } from "@/api/system/dept/type";
-import { fetchDeptTree } from "@/api/system/user";
+import { fetchDeptTree, listUser } from "@/api/system/user";
 import { UserForm, UserQuery } from "@/api/system/user/type";
 import { useDict } from "@/utils/dict";
 
@@ -80,6 +81,7 @@ const initQueryData: PageData<UserForm, UserQuery> = {
   }
 };
 const queryData = ref<PageData<UserForm, UserQuery>>(initQueryData);
+const userList = ref<UserVO[]>([]);
 
 const { queryParams } = toRefs<PageData<UserForm, UserQuery>>(queryData.value);
 const { sys_normal_disable } = toRefs<any>(useDict("sys_normal_disable"));
@@ -110,9 +112,17 @@ const handleQuery = () => {
 const resetQuery = () => {
   // todo 重置查询
 };
+/**
+ * 获取用户列表
+ */
+const getUserList = async () => {
+  const res = await listUser();
+  userList.value = res.rows;
+};
 
 onMounted(() => {
   getDepTree();
+  getUserList();
 });
 </script>
 
@@ -135,6 +145,7 @@ onMounted(() => {
       </el-col>
       <!-- 部门人员具体信息-->
       <el-col :lg="20" :xs="24">
+        <!-- 搜索条件 -->
         <el-card shadow="hover" class="mb-[10px]">
           <el-form :model="queryParams" ref="queryFormRef" :inline="true">
             <el-form-item label="用户名称" prop="userName">
@@ -168,7 +179,24 @@ onMounted(() => {
             </el-form-item>
           </el-form>
         </el-card>
-        <el-card shadow="hover"> 详细信息栏</el-card>
+        <!-- 搜索结果 -->
+        <el-card shadow="hover">
+          <template #header> 表头功能区 </template>
+          <el-table :data="userList" style="width: 100%">
+            <el-table-column type="selection" width="50" align="center" />
+            <el-table-column key="userId" label="编号" align="center" prop="userId" />
+            <el-table-column key="userName" label="名称" align="center" prop="userName" />
+            <el-table-column key="nickName" label="昵称" align="center" prop="nickName" />
+            <el-table-column key="deptName" label="部门" align="center" prop="deptName" />
+            <el-table-column key="phonenumber" label="手机号" align="center" prop="phonenumber" />
+            <el-table-column key="status" label="状态" align="center" prop="status">
+              <template #default="scope">
+                <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" />
+              </template>
+            </el-table-column>
+            <el-table-column key="createTime" label="创建时间" align="center" prop="createTime" />
+          </el-table>
+        </el-card>
       </el-col>
     </el-row>
   </div>
