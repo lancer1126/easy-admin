@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import systemUserApi from "@/api/system/user";
+import customRule from "@/utils/formRule";
 import { UserVO } from "@/api/system/user/type";
 import { DeptTreeVO } from "@/api/system/dept/type";
-import { fetchDeptTree, listUser } from "@/api/system/user";
 import { UserForm, UserQuery } from "@/api/system/user/type";
 import { useDict } from "@/utils/dict";
+import { confirmModal } from "@/utils/modal";
 
+// 用户数据表单是否在加载
+const tableLoading = ref<boolean>(false);
+// 共查询到多少条用户数据
+const totalRow = ref<number>(0);
 const deptSearch = ref<string>("");
 const deptTreeData = ref<DeptTreeVO[]>([]);
 const deptTreeProps = {
@@ -12,7 +18,6 @@ const deptTreeProps = {
   children: "children"
 };
 const dateRange = ref<[DateModelType, DateModelType]>(["", ""]);
-
 // 查询表单的引用
 const queryFormRef = ref<ElFormInstance>();
 // 查询表单的默认值
@@ -42,43 +47,7 @@ const initQueryData: PageData<UserForm, UserQuery> = {
     deptId: "",
     roleId: ""
   },
-  rules: {
-    userName: [
-      { required: true, message: "用户名称不能为空", trigger: "blur" },
-      {
-        min: 2,
-        max: 20,
-        message: "用户名称长度必须介于 2 和 20 之间",
-        trigger: "blur"
-      }
-    ],
-    nickName: [{ required: true, message: "用户昵称不能为空", trigger: "blur" }],
-    password: [
-      { required: true, message: "用户密码不能为空", trigger: "blur" },
-      {
-        min: 5,
-        max: 20,
-        message: "用户密码长度必须介于 5 和 20 之间",
-        trigger: "blur"
-      },
-      { pattern: /^[^<>"'|\\]+$/, message: "不能包含非法字符：< > \" ' \\ |", trigger: "blur" }
-    ],
-    email: [
-      {
-        type: "email",
-        message: "请输入正确的邮箱地址",
-        trigger: ["blur", "change"]
-      }
-    ],
-    phonenumber: [
-      {
-        pattern: /^1[3|456789][0-9]\d{8}$/,
-        message: "请输入正确的手机号码",
-        trigger: "blur"
-      }
-    ],
-    roleIds: [{ required: true, message: "用户角色不能为空", trigger: "blur" }]
-  }
+  rules: customRule.userFormRules
 };
 const queryData = ref<PageData<UserForm, UserQuery>>(initQueryData);
 const userList = ref<UserVO[]>([]);
@@ -97,7 +66,7 @@ const handleNodeCLick = (node: DeptTreeVO) => {
  * 获取用户管理中的部门信息
  */
 const getDepTree = async () => {
-  const res = await fetchDeptTree();
+  const res = await systemUserApi.fetchDeptTree();
   deptTreeData.value = res.data;
 };
 /**
@@ -115,9 +84,58 @@ const resetQuery = () => {
 /**
  * 获取用户列表
  */
-const getUserList = async () => {
-  const res = await listUser();
-  userList.value = res.rows;
+const getUserList = async (pageNum?: number, pageSize?: number) => {
+  tableLoading.value = true;
+  if (pageNum !== undefined && pageNum > 0) {
+    queryParams.value.pageNum = pageNum;
+  }
+  if (pageSize !== undefined && pageSize > 0) {
+    queryParams.value.pageSize = pageSize;
+  }
+
+  try {
+    const res = await systemUserApi.listUser(queryParams.value);
+    userList.value = res.rows;
+    totalRow.value = res.total;
+  } finally {
+    tableLoading.value = false;
+  }
+};
+/**
+ * 更新用户信息
+ */
+const handleUpdateUser = async (row: UserForm) => {
+  // todo 修改用户信息
+  return null;
+};
+/**
+ * 删除用户信息
+ * @param row
+ */
+const handleDeleteUser = async (row: UserForm) => {
+  const userId = row.userId;
+  if (!userId) {
+    ElMessage.error("用户ID不能为空");
+    return;
+  }
+
+  await confirmModal("是否删除用户？");
+  await systemUserApi.delUser(userId);
+  await getUserList();
+  ElMessage.success("删除成功");
+};
+/**
+ * 跳转页面
+ */
+const pageNumChange = async (pageNum: number) => {
+  await getUserList(pageNum, undefined);
+};
+/**
+ * 切换每页显示条数
+ * @param pageSize
+ */
+const pageSizeChange = async (pageSize: number) => {
+  await getUserList(undefined, pageSize);
 };
 
 onMounted(() => {
@@ -182,7 +200,8 @@ onMounted(() => {
         <!-- 搜索结果 -->
         <el-card shadow="hover">
           <template #header> 表头功能区 </template>
-          <el-table :data="userList" style="width: 100%">
+          <!-- 表单内容 -->
+          <el-table v-loading="tableLoading" :data="userList" style="width: 100%">
             <el-table-column type="selection" width="50" align="center" />
             <el-table-column key="userId" label="编号" align="center" prop="userId" />
             <el-table-column key="userName" label="名称" align="center" prop="userName" />
@@ -195,11 +214,35 @@ onMounted(() => {
               </template>
             </el-table-column>
             <el-table-column key="createTime" label="创建时间" align="center" prop="createTime" />
+            <!-- 操作区 -->
+            <el-table-column label="操作" align="center">
+              <template #default="scope">
+                <el-tooltip class="box-item" content="修改">
+                  <el-button link type="primary" icon="Edit" @click="handleUpdateUser(scope.row)" />
+                </el-tooltip>
+                <el-tooltip class="box-item" content="删除">
+                  <el-button link type="primary" icon="Delete" @click="handleDeleteUser(scope.row)" />
+                </el-tooltip>
+              </template>
+            </el-table-column>
           </el-table>
+          <!-- 页面选择区 -->
+          <Pagination
+            :page-num="queryParams.pageNum"
+            :limit-size="queryParams.pageSize"
+            :total="totalRow"
+            @page-change="pageNumChange"
+            @size-change="pageSizeChange"
+          />
         </el-card>
       </el-col>
     </el-row>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.box-item {
+  width: 110px;
+  margin-top: 10px;
+}
+</style>
